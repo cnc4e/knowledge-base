@@ -1,0 +1,20 @@
+formatter: markdown
+content: |-
+  {{ .Requirements }}
+
+  ## Resources
+
+  | Name | File | Description |
+  |------|------|-------------|
+  {{- range .Module.Resources }}
+    {{- $isResource := and $.Config.Sections.Resources (eq "resource" (printf "%s" .GetMode)) }}
+    {{- $isDataResource := and $.Config.Sections.DataSources (eq "data source" (printf "%s" .GetMode)) }}
+    {{- if or $isResource $isDataResource }}
+  {{- $fullspec := ternary .URL (printf "| [%s](%s)" .Spec .URL) .Spec }}
+  {{ $fullspec }} | {{ .Position.Filename }} | {{  tostring .Description | sanitizeMarkdownTbl   }} | 
+    {{- end }}
+  {{- end }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}

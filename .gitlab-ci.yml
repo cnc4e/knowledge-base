@@ -1,0 +1,37 @@
+stages:
+  - fmt
+  - tflint
+  - docs
+
+fmt:
+  stage: fmt
+  tags:
+    - shared
+  image:
+    name: hashicorp/terraform:1.10.3
+    entrypoint: [""]
+  script:
+    - terraform fmt -recursive -diff=true -check=true
+
+tflint:
+  stage: tflint
+  tags:
+    - shared
+  image:
+    name: ghcr.io/terraform-linters/tflint:v0.54.0
+    entrypoint: [""]
+  variables:
+    TFLINT_CONFIG_FILE: ${CI_PROJECT_DIR}/.tflint-ci.hcl
+  script:
+    - tflint --init
+    - tflint --recursive --config ${TFLINT_CONFIG_FILE}
+
+docs:
+  stage: docs
+  tags:
+    - shared
+  image:
+    name: quay.io/terraform-docs/terraform-docs:0.19.0
+    entrypoint: [""]
+  script:
+    - ${CI_PROJECT_DIR}/scripts/check-docs.sh ${CI_PROJECT_DIR}
